@@ -1,9 +1,9 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 
-import { verify, decode } from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
-// import axios from 'axios'
+import axios from 'axios'
 // import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
@@ -12,8 +12,7 @@ const logger = createLogger('auth')
 // TODO: Provide a URL that can be used to download a certificate that can be used
 // to verify JWT token signature.
 // To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
-// const jwksUrl = 'https://dev-eulvc7vt7hs3pjrr.us.auth0.com/.well-known/jwks.json'
-const Auth0_Secret_Id = process.env.AUTH_0_SECRET_ID
+const jwksUrl = 'https://dev-eulvc7vt7hs3pjrr.us.auth0.com/.well-known/jwks.json'
 
 export const handler = async (
   event: CustomAuthorizerEvent
@@ -56,23 +55,26 @@ export const handler = async (
 }
 
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
-  const token = getToken(authHeader)
-  // const jwt: Jwt = decode(token, { complete: true }) as Jwt
-
-  // const jwks = await axios.get(jwksUrl);
-  // const cert = jwks.data.keys[0].x5c
-
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
   
-  return verify(token, Auth0_Secret_Id) as JwtPayload
+  
+  try {
+    const token = getToken(authHeader)
+    const jwks = await axios.get(jwksUrl);
+    const firstJwkSecretKeyData = jwks.data.keys[0].x5c[0]
+    const certificate = `-----BEGIN CERTIFICATE-----\n${firstJwkSecretKeyData}\n-----END CERTIFICATE-----`
 
-//   return verify(
-//     token,           // Token from an HTTP header to validate
-//     Auth0_Secret_Id,            // A certificate copied from Auth0 website
-//     { algorithms: ['RS256'] } // We need to specify that we use the RS256 algorithm
-// ) as JwtPayload
+      return verify(
+          token,           // Token from an HTTP header to validate
+          certificate,            // A certificate copied from Auth0 website
+          { algorithms: ['RS256'] } // We need to specify that we use the RS256 algorithm
+      ) as JwtPayload
+    
+} catch (error) {
+  logger.info('Token authentication failed', error)
+}
 }
 
 function getToken(authHeader: string): string {

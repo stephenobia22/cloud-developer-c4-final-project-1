@@ -27,8 +27,7 @@ provider:
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-asdf${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    AUTH_0_SECRET_ID: vX8B6gk5RuBKsjr8Hj-95f3DJUrRxbWa2mo-bOw951jFJnbwCdNeYwH6ewZ4oW6r
-
+    
   logs:
     # Enable API Gateway logs
     restApi: true
