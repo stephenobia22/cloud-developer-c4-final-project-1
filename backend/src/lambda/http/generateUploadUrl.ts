@@ -4,8 +4,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import * as middy from "middy";
 import { cors, httpErrorHandler } from "middy/middlewares";
 
-import { createAttachmentPresignedUrl } from "../../businessLogic/todos";
-import { TodoAccess } from "../../helpers/todosAcess";
+import { createAttachmentPresignedUrl } from "../../helpers/businessLogic";
+import { TodoAccess } from "../../helpers/dataLayer";
 import { getUserId } from '../utils'
 
 const todoAccess = new TodoAccess()
