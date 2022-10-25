@@ -8,7 +8,7 @@ import { UpdateTodoRequest } from "../requests/UpdateTodoRequest";
 import { getUploadUrl } from "../helpers/attachmentUtils";
 
 const todoAccess = new TodoAccess();
-// const bucketName = process.env.ATTACHMENT_S3_BUCKET;
+
 
 export async function createTodo(
   event: APIGatewayProxyEvent,
@@ -39,9 +39,6 @@ export async function getAllUserTodos(
 
 
 export async function createAttachmentPresignedUrl(todoId: string): Promise<string> {
-    // const todo = await todoAccess.getTodoById(todoId)
-    // todo.attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}`
-
     return getUploadUrl(todoId)
 }
 
@@ -63,6 +60,7 @@ export async function updateTodo(todoId:string, event: APIGatewayProxyEvent): Pr
 
 export async function deleteTodo(todoId: string, event: APIGatewayProxyEvent): Promise<TodoItem> {
   const userId = getUserId(event);
+  console.log("Attempting to delete a todo", todoId, userId)
 
   // Check if todo created by user exists
   const todo = await todoAccess.getTodoUsingTodoIdAndUserId(todoId, userId)

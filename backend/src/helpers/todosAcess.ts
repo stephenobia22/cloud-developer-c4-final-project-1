@@ -59,22 +59,6 @@ export class TodoAccess {
     }
   }
 
-  //   async updateTodoImageAttribute(todo: TodoItem): Promise<TodoItem> {
-  //     console.log("Updating todo image index");
-
-  //     const result = await this.docClient
-  //       .update({
-  //         TableName: this.todosTable
-  //       })
-  //       .promise();
-
-  //     const items = result.Items;
-
-  //     if(items.length !== 0){
-  //         return items[0] as TodoItem
-  //     }
-  //   }
-
   async createTodo(todo: TodoItem): Promise<TodoItem> {
     logger.info("Creating todo item for user");
     await this.docClient
@@ -122,6 +106,26 @@ export class TodoAccess {
           ":name": updatedTodo.name,
           ":dueDate": updatedTodo.dueDate,
           ":done": updatedTodo.done,
+        },
+      })
+      .promise();
+  }
+
+
+  async updateTodoImageAttribute(todoId: string, userId: string, ) {
+    logger.info("Updating todo image index");
+
+    await this.docClient
+      .update({
+        TableName: this.todosTable,
+        Key: { todoId: todoId, userId: userId },
+        UpdateExpression:
+          "set #attachmentUrl = :attachmentUrl",
+        ExpressionAttributeNames: {
+          "#attachmentUrl": "attachmentUrl",
+        },
+        ExpressionAttributeValues: {
+          ":attachmentUrl": todoId,
         },
       })
       .promise();
