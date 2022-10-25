@@ -10,14 +10,16 @@ import { getUserId } from '../utils'
 
 const todoAccess = new TodoAccess()
 
+const bucketName = process.env.ATTACHMENT_S3_BUCKET;
+
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const todoId = event.pathParameters.todoId;
     const userId = getUserId(event)
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    const todo = await todoAccess.getTodoUsingTodoIdAndUserId(todoId, userId)
+    const todoExist = await todoAccess.getTodoUsingTodoIdAndUserId(todoId, userId)
 
-    if(!todo){
+    if(!todoExist){
       return {
         statusCode: 404,
         body: JSON.stringify({
@@ -25,6 +27,10 @@ export const handler = middy(
         })
       }
     }
+    
+    const attachmentUrl: string = `https://${bucketName}.s3.amazonaws.com/${todoId}`
+
+    await todoAccess.updateTodoImageAttribute(todoId, userId, attachmentUrl)
 
     const url = await createAttachmentPresignedUrl(todoId);
 

@@ -112,7 +112,7 @@ export class TodoAccess {
   }
 
 
-  async updateTodoImageAttribute(todoId: string, userId: string, ) {
+  async updateTodoImageAttribute(todoId: string, userId: string, attachmentUrl: string) {
     logger.info("Updating todo image index");
 
     await this.docClient
@@ -125,7 +125,7 @@ export class TodoAccess {
           "#attachmentUrl": "attachmentUrl",
         },
         ExpressionAttributeValues: {
-          ":attachmentUrl": todoId,
+          ":attachmentUrl": attachmentUrl,
         },
       })
       .promise();
